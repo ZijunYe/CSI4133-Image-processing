@@ -1,7 +1,7 @@
 # Lab2
 # Name: Zijun Ye 
 # Student Number: 300168065
-import cv2 
+import cv2  
 
 #1 load image 
 carFrame1 = cv2.imread('images01/car1.bmp')
