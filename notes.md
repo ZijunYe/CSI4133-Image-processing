@@ -17,4 +17,4 @@
 3. Calculate the pixel intensity difference between two images(absolute value)
 4. Perform thresholding on the difference image to get areas movement in binary format 
 5. change threshold values to see different results
-6. Save the best resulting image 
+6. Save the best resulting images
