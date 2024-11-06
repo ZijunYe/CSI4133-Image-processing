@@ -1,3 +1,4 @@
+
 import cv2
 import mediapipe as mp
 import numpy as np
@@ -49,8 +50,11 @@ with mphands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confi
         processFrames = hands.process(rgb_frame)
 
         # Draw Green Rectangle around detected hands 
-        if processFrames.multi_hand_landmarks:
-            for hands_landmarks in processFrames.multi_hand_landmarks:
+        if processFrames.multi_hand_landmarks and processFrames.multi_handedness:
+           for hand_landmarks, hand_info in zip(processFrames.multi_hand_landmarks, processFrames.multi_handedness):
+                # Get handedness (left or right) from the handedness object
+                hand_label = hand_info.classification[0].label  # 'Left' or 'Right'
+                # print(f"Detected {hand_label} hand.") 
 
                 # finding the max and min value between the hand landmarks
                 # the value between max and min will be the height and width of the green rectangle 
@@ -60,9 +64,9 @@ with mphands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confi
 
                 # for the movements
                 sum_x, sum_y = 0, 0
-                num_points = len(hands_landmarks.landmark)
+                num_points = len(hand_landmarks.landmark)
 
-                for landmark in hands_landmarks.landmark:
+                for landmark in hand_landmarks.landmark:
                     # landmark.x and y is the float number between 0 and 1, which determine where 
                     # frame.shape[1] is the width of the frame in pixels.
                     # frame.shape[0] is the height of the frame in pixels.
@@ -80,15 +84,18 @@ with mphands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confi
                 center_x = int(sum_x / num_points)
                 center_y = int(sum_y / num_points)
 
-                #appending the hand position into the list
-                hand_centers.append((center_x,center_y))
+                
+                hand_paths[hand_label].append((center_x, center_y))
+                # print(f"Path length for {hand_label} hand: {len(hand_paths[hand_label])}")
 
                 #draw the green rectangle around hand 
                 cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (0, 255, 0), 5)
 
                 #trace the movement of the center of hand 
-                for i in range(1,len(hand_centers)):
-                    cv2.line(frame, hand_centers[i - 1], hand_centers[i], (255, 0, 255), 2)  
+                path_color = (128, 0, 128) if hand_label == 'Left' else (255, 0, 0 )
+                cv2.polylines(frame, [np.array(hand_paths[hand_label], np.int32)], isClosed=False, color=path_color, thickness=2)
+
+                cv2.putText(frame, f"{hand_label} Hand", (x_min, y_min - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, path_color, 1, cv2.LINE_AA)
                 
                 
         # Write the frame with rectangles to the output video
