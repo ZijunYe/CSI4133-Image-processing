@@ -69,7 +69,7 @@ cv2.imshow("Line_edges",edges)
     
 # #2.3 Apply Line Hough Transform 
 # Lines = cv2.HoughLinesP(edges, rho=1,theta=np.pi / 180, threshold=120, minLineLength=50, maxLineGap=1)
-lines = cv2.HoughLines(edges, rho=0.2, theta=np.pi / 70, threshold=20)
+lines = cv2.HoughLines(edges, rho=1, theta=np.pi / 180*2.02, threshold=68, min_theta= 0, max_theta=np.pi)
 
 # Difference between HoughLinesP and HoughLines 
 # - HoughLinesP: which is detect the line segment 
@@ -149,8 +149,6 @@ for point in intersections:
         cv2.circle(line1, point,2, (0, 0, 255), -1)
 
 cv2.imshow("Intersection", line1)
-
-
 
 
 

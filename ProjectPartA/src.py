@@ -1,3 +1,8 @@
+# CSI41033 Project Part A
+# Name: Zijun Ye 
+# Student Number: 300168065
+import cv2 
+import numpy as np
 
 import cv2
 import mediapipe as mp
