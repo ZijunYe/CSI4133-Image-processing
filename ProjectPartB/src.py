@@ -5,6 +5,8 @@
 # Import the required modules 
 import cv2 
 from deepface import DeepFace
+import numpy as np
+recent_predictions = []
 
 # Open webcam + save the video after close the window 
 # Open the default camera
@@ -29,7 +31,15 @@ while True:
         break
 
     # 1. Face Detection 
+    # result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
     result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
+
+    emotion = result[0]['dominant_emotion']
+
+    recent_predictions.append(emotion)
+    if len(recent_predictions) > 5:  # Keep the last 5 predictions
+        recent_predictions.pop(0)
+    smoothed_emotion = max(set(recent_predictions),key= recent_predictions.count)
 
     # Draw rectangle
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -42,7 +52,10 @@ while True:
     
     # Font type
     # Write these things
-    cv2.putText(frame, result[0]['dominant_emotion'], (0, 50), font, 2, (0, 255, 0), 3, cv2.LINE_4)
+    # cv2.putText(frame, result[0]['dominant_emotion'], (0, 50), font, 2, (0, 255, 0), 3, cv2.LINE_4)
+    cv2.putText(frame, smoothed_emotion, (0, 50), font, 2, (0, 255, 0), 3, cv2.LINE_4)
+    
+
 
     # Write the frame to the output file
     out.write(frame)
