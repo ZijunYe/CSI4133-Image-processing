@@ -2,14 +2,13 @@
 # Name: Zijun Ye 
 # Student Number: 300168065
 
-# import the required modules 
+# Import the required modules 
 import cv2 
 from deepface import DeepFace
 
 # Open webcam + save the video after close the window 
 # Open the default camera
 cam = cv2.VideoCapture(0)
-
 
 # Haar Cascade File Path 
 facecascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -25,22 +24,25 @@ out = cv2.VideoWriter('result.mp4', fourcc, 20.0, (frame_width, frame_height))
 while True:
     ret, frame = cam.read()
 
+    if not ret:
+        print("Failed to grab frame. Exiting...")
+        break
+
     # 1. Face Detection 
-    result= DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
+    result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
 
-    #draw rectangle
-    gray=cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+    # Draw rectangle
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    faces=facecascade.detectMultiScale(gray,1.1,4)
-    for(x,y,w,h) in faces:
-        cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
+    faces = facecascade.detectMultiScale(gray, 1.1, 4)
+    for (x, y, w, h) in faces:
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-
-    font=cv2.FONT_HERSHEY_SIMPLEX
+    font = cv2.FONT_HERSHEY_SIMPLEX
     
-    #font type
-    #write these things
-    cv2.putText(frame,result[0]['dominant_emotion'],(0,50),font,2,(0,255,0),3,cv2.LINE_4);
+    # Font type
+    # Write these things
+    cv2.putText(frame, result[0]['dominant_emotion'], (0, 50), font, 2, (0, 255, 0), 3, cv2.LINE_4)
 
     # Write the frame to the output file
     out.write(frame)
@@ -48,8 +50,9 @@ while True:
     # Display the captured frame
     cv2.imshow('Face Detection and Analysis', frame)
 
-    # Press 'q' to exit the loop
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    # Press any key to exit the loop
+    if cv2.waitKey(1) != -1:  # Any key pressed will break the loop
+        print("Key pressed. Exiting loop...")
         break
 
 # Release the capture and writer objects
